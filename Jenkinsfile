@@ -1,18 +1,11 @@
 pipeline {
-    agent any
+    agent any  // Use any available agent
 
     tools {
-        maven 'Maven'   // Make sure Maven is configured in Jenkins
-        jdk 'JDK'      // Change based on your setup
+        maven 'Maven'  // Ensure this matches the name configured in Jenkins
     }
-
-    environment {
-        APP_NAME = "MyGuavaApp"
-    }
-
     stages {
-
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 git branch: 'master', url: 'https://github.com/Kavya-nyamagoud/MyMavenGuavaApp.git'
             }
@@ -20,43 +13,35 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean compile'
+                sh 'mvn clean package'  // Run Maven build
             }
         }
 
         stage('Test') {
             steps {
-                sh 'mvn test'
+                sh 'mvn test'  // Run unit tests
             }
         }
 
-        stage('Package') {
+        
+        
+       
+        stage('Run Application') {
             steps {
-                sh 'mvn package'
+                // Start the JAR application
+                sh 'java -jar target/MyMavenApp-1.0-SNAPSHOT.jar'
             }
         }
 
-        stage('Archive Artifacts') {
-            steps {
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo "Deploying ${APP_NAME}..."
-                // Example deployment (customize this)
-                sh 'cp target/*.jar /opt/myguava-app/'
-            }
-        }
+        
     }
 
     post {
         success {
-            echo 'Build Successful '
+            echo 'Build and deployment successful!'
         }
         failure {
-            echo 'Build Failed '
+            echo 'Build failed!'
         }
     }
 }
